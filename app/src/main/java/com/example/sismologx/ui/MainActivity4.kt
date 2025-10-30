@@ -1,18 +1,19 @@
-package com.example.sismologx
+package com.example.sismologx.ui
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.sismologx.R
 
-class MainActivity3 : AppCompatActivity() {
+class MainActivity4 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main3)
+        setContentView(R.layout.activity_main4)
 
-        //VENTANA GUIA PREVENCION SISMOS
+        //VENTANA CONFIGURACIONES
 
 
 

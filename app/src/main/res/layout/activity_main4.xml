@@ -6,7 +6,7 @@
     android:background="#101B21"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity4">
+    tools:context=".ui.MainActivity4">
 
     <Button
         android:id="@+id/btnGuardarCambios"

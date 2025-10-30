@@ -6,7 +6,7 @@
     android:background="#101B21"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity2">
+    tools:context=".ui.MainActivity2">
 
     <TextView
         android:id="@+id/textView"
@@ -24,11 +24,16 @@
         app:layout_constraintVertical_bias="0.042" />
 
     <ListView
-        android:layout_width="407dp"
-        android:layout_height="652dp"
+        android:id="@+id/lvSismosRecientes"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/textView"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.797" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:clipToPadding="false"
+        android:paddingTop="0dp" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
