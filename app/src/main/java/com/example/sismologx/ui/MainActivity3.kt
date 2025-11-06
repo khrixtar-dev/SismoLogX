@@ -1,6 +1,8 @@
 package com.example.sismologx.ui
 
 import android.os.Bundle
+import android.text.Html
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -15,6 +17,10 @@ class MainActivity3 : AppCompatActivity() {
 
         //VENTANA GUIA PREVENCION SISMOS
 
+        val textView = findViewById<TextView>(R.id.txParrafo2)
+        val texto = " <strong>Primero que nada debes de mantener la calma.</strong>" +
+                "Es importante no correr ni gritar, ya que esto puede aumentar el riesgo de lesiones."
+        textView.text = Html.fromHtml(texto, Html.FROM_HTML_MODE_LEGACY)
 
 
 
