@@ -29,7 +29,7 @@ class SismoAdapter(
 
         // Asignar texto
         tvPlace.text = sismo.place
-        tvMagnitude.text = sismo.magnitude.toString()
+        tvMagnitude.text = sismo.magnitude
         tvDate.text = sismo.date
         tvHour.text = sismo.hour
 
@@ -43,9 +43,7 @@ class SismoAdapter(
             magnitudeValue >= 4.0 -> Color.parseColor("#eab308") // amarillo claro
             else -> Color.parseColor("#22c55e") // verde
         }
-
         background.setColor(color)
-
         return view
     }
 }
