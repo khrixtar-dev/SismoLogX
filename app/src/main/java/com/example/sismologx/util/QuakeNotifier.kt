@@ -19,32 +19,21 @@ object QuakeNotifier {
 
     fun ensureChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
+            val ch = NotificationChannel(
+                CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH
             ).apply { description = CHANNEL_DESC }
-            context.getSystemService(NotificationManager::class.java)
-                .createNotificationChannel(channel)
+            context.getSystemService(NotificationManager::class.java).createNotificationChannel(ch)
         }
     }
 
     private fun hasPostNotificationsPermission(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.POST_NOTIFICATIONS
+                context, Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true
-        }
+        } else true
     }
 
-    /**
-     * Muestra una notificación.
-     * - [title]: por ejemplo "Alerta de nuevo sismo de M 5.6"
-     * - [text]: acepta saltos de línea. Si contiene "\n", se usa BigTextStyle.
-     */
     @SuppressLint("MissingPermission")
     fun notify(context: Context, id: String, title: String, text: String) {
         ensureChannel(context)
@@ -53,7 +42,7 @@ object QuakeNotifier {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
-            .setContentText(text.lines().firstOrNull() ?: text) // resumen en una línea
+            .setContentText(text.lines().firstOrNull() ?: text)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 

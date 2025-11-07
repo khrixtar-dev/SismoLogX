@@ -1,10 +1,12 @@
 package com.example.sismologx.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
@@ -20,7 +22,7 @@ import com.example.sismologx.util.SettingsPrefs
 import kotlin.math.round
 
 
-class MainActivity4 : AppCompatActivity() {
+class SettingsActivity : AppCompatActivity() {
 
     private val requestNotifPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -38,7 +40,7 @@ class MainActivity4 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main4)
+        setContentView(R.layout.settings_activity)
 
         //VENTANA CONFIGURACIONES
 
@@ -53,6 +55,7 @@ class MainActivity4 : AppCompatActivity() {
         val seekBarMagnitud: SeekBar = findViewById(R.id.seekBarMagnitud)
         val txMagnitud: TextView = findViewById(R.id.txMagnitud)
         val btnGuardarCambios: Button = findViewById(R.id.btnGuardarCambios)
+
 
         // estado inicial desde preferencias
         seekBarMagnitud.max = maxProgress
@@ -100,8 +103,13 @@ class MainActivity4 : AppCompatActivity() {
             Toast.makeText(this, "Configuración guardada", Toast.LENGTH_SHORT).show()
         }
 
-
-
+        val btnRowBack: ImageButton = findViewById(R.id.btnBack)
+        btnRowBack.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            startActivity(intent)
+        }
 
 
 

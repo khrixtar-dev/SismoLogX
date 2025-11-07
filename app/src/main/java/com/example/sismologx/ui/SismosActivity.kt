@@ -1,6 +1,8 @@
 package com.example.sismologx.ui
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageButton
 import android.widget.ListView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -12,7 +14,7 @@ import com.example.sismologx.R
 import com.example.sismologx.viewmodel.SismoViewModel
 
 
-class MainActivity2 : AppCompatActivity() {
+class SismosActivity : AppCompatActivity() {
 
     private lateinit var lvSismosRecientes: ListView
     private lateinit var sismoViewModel: SismoViewModel
@@ -20,7 +22,7 @@ class MainActivity2 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main2)
+        setContentView(R.layout.sismos_activity)
 
         lvSismosRecientes = findViewById(R.id.lvSismosRecientes)
 
@@ -35,6 +37,16 @@ class MainActivity2 : AppCompatActivity() {
                 Toast.makeText(this, "No hay sismos recientes", Toast.LENGTH_SHORT).show()
             }
         }
+
+
+        val btnRowBack: ImageButton = findViewById(R.id.btnBack)
+        btnRowBack.setOnClickListener {
+            val intent = Intent(this, HomeActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            startActivity(intent)
+        }
+
 
         // Cargamos los sismos desde la API
         sismoViewModel.cargarSismos()

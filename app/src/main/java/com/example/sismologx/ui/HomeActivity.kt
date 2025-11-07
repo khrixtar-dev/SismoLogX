@@ -2,10 +2,9 @@ package com.example.sismologx.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.work.Constraints
@@ -17,49 +16,50 @@ import com.example.sismologx.R
 import com.example.sismologx.workers.SyncWorker
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.home_activity)
 
-        // Programar el worker periódico una sola vez
+        // Programa el worker periódico (se encola solo una vez)
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val work = PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES) // mínimo 15 min
+        val work = PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "quake_sync",
-            ExistingPeriodicWorkPolicy.KEEP, // no reprograma si ya existe
+            ExistingPeriodicWorkPolicy.KEEP,
             work
         )
-        //VENTANA PANTALLA PRINCIPAL
-        val btnUltimosSismos : Button = findViewById(R.id.btnUltimosSismos)
-        val btnGuia : Button = findViewById(R.id.btnGuia)
-        val btnConfiguracion : ImageView = findViewById(R.id.btnConfiguracion)
 
+        // Referencias a las tarjetas del home
+        val cardSismos : CardView = findViewById(R.id.cardSismos)
+        val cardGuia   : CardView = findViewById(R.id.cardGuia)
+        val cardConfig : CardView = findViewById(R.id.cardConfig)
 
-        btnUltimosSismos.setOnClickListener {
-            val toUltimosSismos = Intent(this, MainActivity2::class.java)
+        // Navegación
+        cardSismos.setOnClickListener {
+            val toUltimosSismos = Intent(this, SismosActivity::class.java)
             startActivity(toUltimosSismos)
         }
 
-        btnGuia.setOnClickListener {
-            val toGuia = Intent(this, MainActivity3::class.java)
+        cardGuia.setOnClickListener {
+            val toGuia = Intent(this, BeforeGuideActivity::class.java)
             startActivity(toGuia)
         }
 
-        btnConfiguracion.setOnClickListener {
-            val toConfiguracion = Intent(this, MainActivity4::class.java)
+        cardConfig.setOnClickListener {
+            val toConfiguracion = Intent(this, SettingsActivity::class.java)
             startActivity(toConfiguracion)
         }
 
-
+        // Opcional: maneja insets del sistema (si ves que te mueve el layout, puedes quitarlo)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

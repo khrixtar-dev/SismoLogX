@@ -10,11 +10,9 @@ import com.example.sismologx.util.SettingsPrefs
 import com.example.sismologx.model.Sismo
 import com.example.sismologx.model.SismoResponse
 import retrofit2.Response
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.LocalDateTime
-import java.time.ZoneId
+import java.time.*
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 import kotlin.math.round
 
 class SyncWorker(appContext: Context, params: WorkerParameters) :
@@ -23,100 +21,116 @@ class SyncWorker(appContext: Context, params: WorkerParameters) :
     private val prefs = SettingsPrefs(appContext)
     private val notifyState = NotifyState(appContext)
 
-    // Ajusta a tus formatos reales de date/hour
-    private val dateFmt = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-    private val timeFmt = DateTimeFormatter.ofPattern("HH:mm:ss")
+    // Patrones posibles según APIs típicas (ajústalos si tu backend cambia)
+    private val datePatterns = listOf(
+        DateTimeFormatter.ofPattern("dd-MM-yyyy"),
+        DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    )
+    private val timePatterns = listOf(
+        DateTimeFormatter.ofPattern("HH:mm:ss"),
+        DateTimeFormatter.ofPattern("HH:mm")
+    )
 
     override suspend fun doWork(): Result {
-        // Si el usuario desactivó notificaciones, no hacemos nada costoso
+        // Si el usuario desactivó notificaciones, salimos pronto
         if (!prefs.isNotificationsEnabled()) return Result.success()
 
-        // Llama a la API
         val resp: Response<SismoResponse> = try {
             RetrofitInstance.api.getSismosRecientes()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return Result.retry()
         }
 
         if (!resp.isSuccessful) return Result.retry()
         val body = resp.body() ?: return Result.success()
 
-        // Filtra por umbral y novedad
-        val threshold = prefs.getThreshold()
         val lastEpoch = notifyState.getLastEpoch()
+        val threshold = prefs.getThreshold()
 
-        val nuevos = body.data
-            .mapNotNull { s -> toCandidate(s) }               // convierte y limpia
-            .filter { it.magnitude >= threshold }              // umbral usuario
-            .filter { it.epochMillis > lastEpoch }             // solo nuevos
-            .sortedBy { it.epochMillis }                       // de antiguo a reciente
+        // Mapeo a candidatos con epoch sólido (si no se puede parsear, se descarta)
+        val candidatos = body.data.mapNotNull { s -> toCandidateOrNull(s) }
 
-        // Tomar SOLO el más reciente que cumpla el umbral y sea posterior a lastEpoch
-        val ultimo = nuevos.maxByOrNull { it.epochMillis }
+        if (candidatos.isEmpty()) return Result.success()
+
+        // Bootstrap: primera vez (o sin estado) => fija el último y no notifiques
+        if (lastEpoch == 0L) {
+            val maxEpoch = candidatos.maxOf { it.epochMillis }
+            notifyState.setLastEpoch(maxEpoch)
+            return Result.success()
+        }
+
+        // Filtra por umbral y novedad; toma solo el más reciente
+        val ultimo = candidatos
+            .asSequence()
+            .filter { it.magnitude >= threshold }
+            .filter { it.epochMillis > lastEpoch }
+            .maxByOrNull { it.epochMillis }
+
         if (ultimo != null) {
             val shownMag = round(ultimo.magnitude * 10) / 10.0
-            val title = "Alerta de nuevo sismo de Magnitud $shownMag"
-            val place = if (ultimo.place.isNullOrBlank()) {
-                "Sin lugar"
-            } else{
-                ultimo.place
-            }
+            val title = "Alerta de nuevo sismo de M $shownMag"
+            val place = if (ultimo.place.isNullOrBlank()) "Sin lugar" else ultimo.place!!
             val depth = formatDepth(ultimo.depthText)
-            val text = "Lugar: A $place\nProfundidad: $depth"
+            val text = "Lugar: $place\nProfundidad: $depth"
 
             QuakeNotifier.notify(applicationContext, ultimo.id, title, text)
 
-            // Actualiza el “último notificado” para no repetir
+            // actualiza último notificado para evitar repeticiones
             notifyState.setLastEpoch(ultimo.epochMillis)
         }
 
         return Result.success()
     }
 
-    // Normaliza Sismo → modelo candidato para notificar
-    private fun toCandidate(s: Sismo): Candidate? {
-        val mag = parseDouble(s.magnitude) ?: return null
-        val epoch = parseEpoch(s.date, s.hour) ?: System.currentTimeMillis()
-        val id = if (!s.info.isNullOrBlank()) s.info!!
-        else "${s.date}|${s.hour}|${s.latitude}|${s.longitude}"
+    private fun toCandidateOrNull(s: Sismo): Candidate? {
+        val mag = s.magnitude?.replace(",", ".")?.toDoubleOrNull() ?: return null
+        val epoch = parseEpochOrNull(s.date, s.hour) ?: return null
+
+        val id = when {
+            !s.info.isNullOrBlank() -> s.info!!
+            else -> "${s.date}|${s.hour}|${s.latitude}|${s.longitude}"
+        }
+
         return Candidate(
             id = id,
             epochMillis = epoch,
             magnitude = mag,
-            date = s.date,
-            hour = s.hour,
             place = s.place,
-            depthText = s.depth // usamos el string tal cual (p.ej. "120 km")
+            depthText = s.depth
         )
     }
 
-    private fun parseDouble(str: String?): Double? = try {
-        str?.replace(",", ".")?.toDouble()
-    } catch (_: Exception) { null }
+    private fun parseEpochOrNull(date: String?, hour: String?): Long? {
+        if (date.isNullOrBlank() || hour.isNullOrBlank()) return null
+        val parsedDate = parseFirstOrNull(datePatterns) { it.parse(date) }?.let { LocalDate.from(it) } ?: return null
+        val parsedTime = parseFirstOrNull(timePatterns) { it.parse(hour) }?.let { LocalTime.from(it) } ?: return null
+        return LocalDateTime.of(parsedDate, parsedTime)
+            .atZone(ZoneId.systemDefault())
+            .toInstant()
+            .toEpochMilli()
+    }
 
-    private fun parseEpoch(date: String?, hour: String?): Long? = try {
-        val d = LocalDate.parse(date, dateFmt)
-        val t = LocalTime.parse(hour, timeFmt)
-        LocalDateTime.of(d, t).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    } catch (_: Exception) { null }
+    private fun <T> parseFirstOrNull(
+        formats: List<DateTimeFormatter>,
+        block: (DateTimeFormatter) -> T
+    ): T? {
+        for (fmt in formats) {
+            try { return block(fmt) } catch (_: DateTimeParseException) {}
+        }
+        return null
+    }
 
-    // Normaliza el texto de profundidad: si viene vacío => "N/A", si es número sin sufijo => agrega " km"
     private fun formatDepth(raw: String?): String {
         if (raw.isNullOrBlank()) return "N/A"
         val trimmed = raw.trim()
-        val hasKm = trimmed.lowercase().contains("km")
-        return if (hasKm) trimmed else {
-            val numeric = parseDouble(trimmed)
-            if (numeric != null) "${numeric} km" else trimmed
-        }
+        return if (trimmed.lowercase().contains("km")) trimmed
+        else trimmed.toDoubleOrNull()?.let { "${it} km" } ?: trimmed
     }
 
     private data class Candidate(
         val id: String,
         val epochMillis: Long,
         val magnitude: Double,
-        val date: String,
-        val hour: String,
         val place: String?,
         val depthText: String?
     )

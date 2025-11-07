@@ -2,12 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <!-- Permiso  para conectarte a Internet -->
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <!--  Permiso opcional si luego quieres comprobar conexión antes de llamar la API -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- (para el futuro) Permiso necesario para notificaciones push a partir de Android 13 -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Permiso opcional si luego quieres comprobar conexión antes de llamar la API -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- (para el futuro) Permiso necesario para notificaciones push a partir de Android 13 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
@@ -20,16 +16,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SismoLogX">
         <activity
-            android:name=".ui.MainActivity4"
+            android:name=".ui.AfterGuideActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.MainActivity3"
+            android:name=".ui.DuringGuideActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.MainActivity2"
+            android:name=".ui.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.BeforeGuideActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.SismosActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,6 +39,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
