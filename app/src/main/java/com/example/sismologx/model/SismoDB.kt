@@ -11,6 +11,8 @@ class SismoDB (context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_V
 
     override fun onCreate(db : SQLiteDatabase){
         // Estructura de la tabla
+        // Las variables comensadas con $ , estan definidias abajo en companion object
+        // Si necesitas cambiarlas , cambialas en Companion Object por favor
         db.execSQL(
             """
                 CREATE TABLE $TABLE_SISMOS (
@@ -29,15 +31,22 @@ class SismoDB (context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_V
         )
     }
 
+
+
     // Elimina y crea la tabla
     override fun onUpgrade(db: SQLiteDatabase, old: Int, new: Int) {
+        // Si existe una DB con ese nombre se elimina
         db.execSQL("DROP TABLE IF EXISTS $TABLE_SISMOS")
         onCreate(db)
     }
 
 
+
+    // Se piden los datos de la API para insertar datos en el SQL Lite
     fun insert(date: String, hour: String, place: String, magnitude: String, depth: String,
                latitude: String, longitude: String, image: String, info: String): Long {
+        // ContentValues() contiene los valores como una especie de diccionario
+        // aply , facilita la insercion
         val cv = ContentValues().apply {
             put(COL_DATE, date)
             put(COL_HOUR, hour)
@@ -49,13 +58,16 @@ class SismoDB (context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_V
             put(COL_IMAGE, image)
             put(COL_INFO, info)
         }
+
+        // Da la base de datos como texto
+        // insert(Nombre tabla, valor en caso de ser nulo, Valores a incertar)
         return writableDatabase.insert(TABLE_SISMOS, null, cv)
     }
 
 
     // Listado de datos dentro de la DB
     fun getAll(): List<SismoLocal> {
-        val out = mutableListOf<SismoLocal>()
+        val out = mutableListOf<SismoLocal>() // out = Lista Mutable
         val sql = """
         SELECT $COL_ID, $COL_DATE, $COL_HOUR, $COL_PLACE, $COL_MAGNITUDE, 
                $COL_DEPTH, $COL_LATITUDE, $COL_LONGITUDE, $COL_IMAGE, $COL_INFO
@@ -63,9 +75,15 @@ class SismoDB (context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_V
         ORDER BY $COL_ID DESC
     """.trimIndent()
 
+        // readableDatabase = Lee la base de datos
+        // .rawQuery(Comando SQL, valor por si es nulo) = Ejecuta la query
+        // El cursor recorre 1 por 1 el valor , como s fuera un ciclo for
         val c: Cursor = readableDatabase.rawQuery(sql, null)
+        // Use cierra el cursor cuando se termina de usar
         c.use {
+            // it.moveToNext() = Si hay una siguiente fila , da true , lo ue genera un bucle sin fin hasta que cambie a false ( sin fila )
             while (it.moveToNext()) {
+                // El += , es el equivalente a add()
                 out += SismoLocal(
                     id = it.getInt(0),
                     date = it.getString(1),
@@ -82,6 +100,8 @@ class SismoDB (context: Context) : SQLiteOpenHelper(context, DB_NAME, null, DB_V
         }
         return out
     }
+
+
 
     // Limpiar
     fun clear() {

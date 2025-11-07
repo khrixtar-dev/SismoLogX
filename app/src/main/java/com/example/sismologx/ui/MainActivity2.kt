@@ -9,6 +9,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.sismologx.R
+import com.example.sismologx.repository.SismoLocalDBRepository
 import com.example.sismologx.viewmodel.SismoViewModel
 
 
@@ -24,6 +25,8 @@ class MainActivity2 : AppCompatActivity() {
 
         lvSismosRecientes = findViewById(R.id.lvSismosRecientes)
 
+
+
         // Inicializamos el ViewModel
         sismoViewModel = ViewModelProvider(this)[SismoViewModel::class.java]
 
@@ -36,7 +39,10 @@ class MainActivity2 : AppCompatActivity() {
             }
         }
 
+        // Asignar Prioridad entre corrutinas
         // Cargamos los sismos desde la API
+        sismoViewModel.limpiarDB(this)
+        sismoViewModel.cargarDB(this)
         sismoViewModel.cargarSismos()
 
         // Ajuste de padding para barras de sistema

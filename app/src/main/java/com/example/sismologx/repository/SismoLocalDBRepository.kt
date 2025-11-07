@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import com.example.sismologx.model.SismoDB
 import com.example.sismologx.model.SismoLocal
 
-class SismoLocalDBRepository {
+object SismoLocalDBRepository {
     // Introduce local variable = Da onSuccess o onFailure si sale bien o mal
     // Unit es similar al Void
     // use = Trata el bloque de codigo como un objeto, tambien cierra la base de datos de forma automatica
@@ -16,8 +16,10 @@ class SismoLocalDBRepository {
                        magnitude: String, depth: String, latitude: String, longitude: String,
                        image: String, info: String
     ): Result<Long> = withContext(Dispatchers.IO) {
+        // runCatching = funciona como try catch , devuelve success y failure
         runCatching {
             SismoDB(context).use {
+                // Se llama la funcion insert en SismoDB
                 it.insert(date, hour, place, magnitude, depth, latitude, longitude, image, info)
             }
         }

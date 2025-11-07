@@ -11,10 +11,10 @@ import com.example.sismologx.model.SismoDB
 import com.example.sismologx.model.SismoLocal
 import com.example.sismologx.repository.SismoLocalDBRepository
 
-class LeerSismo {
+// Esta clase esta enfo
+object LeerSismo {
 
-    // Falta controlar el error
-    // Obtener Todos
+
     suspend fun obtenerTodos(context: Context): Result<List<SismoLocal>> {
         return SismoLocalDBRepository.getAll(context)
     }
@@ -42,3 +42,5 @@ class LeerSismo {
         }
     }
 }
+
+
