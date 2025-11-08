@@ -68,7 +68,7 @@ class SyncWorker(appContext: Context, params: WorkerParameters) :
 
         if (ultimo != null) {
             val shownMag = round(ultimo.magnitude * 10) / 10.0
-            val title = "Alerta de nuevo sismo de M $shownMag"
+            val title = "Alerta nuevo sismo de $shownMag"
             val place = if (ultimo.place.isNullOrBlank()) "Sin lugar" else ultimo.place!!
             val depth = formatDepth(ultimo.depthText)
             val text = "Lugar: $place\nProfundidad: $depth"
