@@ -10,7 +10,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.sismologx"
+        applicationId = "com.example.sismapp"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
