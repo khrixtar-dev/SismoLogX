@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.sismologx.R
+import com.example.sismologx.util.QuakeNotifier
 import com.example.sismologx.util.SettingsPrefs
 import kotlin.math.round
 
@@ -36,6 +37,7 @@ class SettingsActivity : AppCompatActivity() {
                 SettingsPrefs(this).setNotificationsEnabled(true)
             }
         }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -101,6 +103,8 @@ class SettingsActivity : AppCompatActivity() {
             prefs.setThreshold(rounded)
             prefs.setNotificationsEnabled(swNotificacion.isChecked)
             Toast.makeText(this, "Configuración guardada", Toast.LENGTH_SHORT).show()
+            val ok = Intent(this, HomeActivity::class.java)
+            startActivity(ok)
         }
 
         val btnRowBack: ImageButton = findViewById(R.id.btnBack)
@@ -109,6 +113,31 @@ class SettingsActivity : AppCompatActivity() {
                 addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
             }
             startActivity(intent)
+        }
+        // dentro de onCreate(...)
+        val btnTestNotif: Button = findViewById(R.id.btnTestNotif)
+        btnTestNotif.setOnClickListener {
+            // Android 13+ pide permiso en runtime
+            if (Build.VERSION.SDK_INT >= 33 &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestNotifPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                return@setOnClickListener
+            }
+
+            // Datos falsos simulando un sismo real
+            val fakeMag = 6.4
+            val fakePlace = "85 km al NO de Iquique"
+            val fakeDepth = "35 km"
+
+            val title = "Alerta de nuevo sismo de ${"%.1f".format(fakeMag)}"
+            val text  = "Lugar: $fakePlace\nProfundidad: $fakeDepth"
+
+            // Manda la notificación usando el mismo helper de producción
+            val fakeId = "test-${System.currentTimeMillis()}"
+            QuakeNotifier.notify(this, fakeId, title, text)
+
         }
 
 
