@@ -59,7 +59,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="#A0A0A0"
-                android:textSize="13sp" />
+                android:textSize="13sp"
+                android:layout_marginTop="2dp"/>
         </LinearLayout>
     </LinearLayout>
 

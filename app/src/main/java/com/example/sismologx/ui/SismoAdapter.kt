@@ -16,9 +16,16 @@ class SismoAdapter(
     private val sismos: List<Sismo>
 ) : ArrayAdapter<Sismo>(context, 0, sismos) {
 
+    private val inFmt  = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    private val outFmt = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")
+
+    private fun formatDateOrNull(raw: String?): String? = try {
+        if (raw.isNullOrBlank()) null
+        else java.time.LocalDate.parse(raw.trim(), inFmt).format(outFmt)
+    } catch (_: Exception) { raw } // si falla, deja el original
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val sismo = sismos[position]
-
         val view = convertView ?: LayoutInflater.from(context)
             .inflate(R.layout.item_sismo, parent, false)
 
@@ -27,11 +34,10 @@ class SismoAdapter(
         val tvDate = view.findViewById<TextView>(R.id.tvDate)
         val tvHour = view.findViewById<TextView>(R.id.tvHour)
 
-        // Asignar texto
         tvPlace.text = sismo.place
         tvMagnitude.text = sismo.magnitude
-        tvDate.text = sismo.date
-        tvHour.text = sismo.hour
+        tvDate.text = formatDateOrNull(sismo.date) ?: ""
+        tvHour.text = sismo.hour ?: ""
 
         // Cambiar color del círculo según magnitud
         val magnitudeValue = sismo.magnitude.toDoubleOrNull()?:0.0

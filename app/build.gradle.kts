@@ -37,7 +37,7 @@ android {
         isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions {
-        jvmTarget = "17" // usa "1.8" si tu proyecto está en 1.8
+        jvmTarget = "17"
     }
 }
 
@@ -75,4 +75,6 @@ dependencies {
     // DESUGARING
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
+    //MapBox
+    implementation("com.mapbox.maps:android:11.16.2")
 }
