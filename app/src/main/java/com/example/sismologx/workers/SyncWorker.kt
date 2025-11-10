@@ -15,6 +15,10 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import kotlin.math.round
 
+// 👇 NUEVOS IMPORTS para cache local
+import com.example.sismologx.repository.SismoLocalDBRepository
+// (no hace falta importar SismoLocal; insert() recibe los campos sueltos)
+
 class SyncWorker(appContext: Context, params: WorkerParameters) :
     CoroutineWorker(appContext, params) {
 
@@ -43,6 +47,31 @@ class SyncWorker(appContext: Context, params: WorkerParameters) :
 
         if (!resp.isSuccessful) return Result.retry()
         val body = resp.body() ?: return Result.success()
+
+        // === Persistencia local (offline) ==============================
+        // Guardamos SIEMPRE lo que vino de la API para que la app tenga
+        // datos disponibles sin Internet la próxima vez que se abra.
+        try {
+            // Estrategia simple: clear + inserts
+            SismoLocalDBRepository.clear(applicationContext).getOrThrow()
+            for (s in body.data) {
+                SismoLocalDBRepository.insert(
+                    applicationContext,
+                    date = s.date,
+                    hour = s.hour,
+                    place = s.place,
+                    magnitude = s.magnitude,
+                    depth = s.depth,
+                    latitude = s.latitude,
+                    longitude = s.longitude,
+                    image = s.image,
+                    info = s.info
+                ).getOrThrow()
+            }
+        } catch (_: Exception) {
+            // Si la cache falla, NO rompemos el worker ni las notificaciones
+        }
+        // ===============================================================
 
         val lastEpoch = notifyState.getLastEpoch()
         val threshold = prefs.getThreshold()

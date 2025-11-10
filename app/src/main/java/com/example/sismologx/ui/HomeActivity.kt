@@ -28,7 +28,7 @@ class HomeActivity : AppCompatActivity() {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val work = PeriodicWorkRequestBuilder<SyncWorker>(15, TimeUnit.MINUTES)
+        val work = PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
 
@@ -59,7 +59,7 @@ class HomeActivity : AppCompatActivity() {
             startActivity(toConfiguracion)
         }
 
-        // Opcional: maneja insets del sistema (si ves que te mueve el layout, puedes quitarlo)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

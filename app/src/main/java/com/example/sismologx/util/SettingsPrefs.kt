@@ -11,6 +11,9 @@ class SettingsPrefs (context: Context){
         const val KEY_NOTIFICATIONS_ENABLED = "notifications_enabled"
         const val KEY_NOTIFICATION_THRESHOLD = "notification_threshold"
         const val DEFAULT_THRESHOLD = 4.0
+
+        // 👇 Nuevo
+        const val KEY_CONTACTS_ENABLED = "contacts_enabled"
     }
 
     fun isNotificationsEnabled(): Boolean =
@@ -29,5 +32,13 @@ class SettingsPrefs (context: Context){
         //opcional : redondear a 0.1
         val rounded = round(value * 10) / 10.0
         prefs.edit().putLong(KEY_NOTIFICATION_THRESHOLD, java.lang.Double.doubleToRawLongBits(rounded)).apply()
+    }
+
+    // 👇 Nuevo
+    fun isContactsEnabled(): Boolean =
+        prefs.getBoolean(KEY_CONTACTS_ENABLED, false)
+
+    fun setContactsEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_CONTACTS_ENABLED, enabled).apply()
     }
 }

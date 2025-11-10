@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.sismologx.R
 import com.example.sismologx.model.Sismo
+import com.example.sismologx.util.ManipularLista
 import com.example.sismologx.viewmodel.SismoViewModel
 
 class SismosActivity : AppCompatActivity() {
@@ -56,7 +57,11 @@ class SismosActivity : AppCompatActivity() {
         }
 
         // Cargar sismos
-        sismoViewModel.cargarSismos()
+        // Antiguo
+        // sismoViewModel.cargarSismos()
+
+        //Nuevo
+        ManipularLista.orden(sismoViewModel, this)
 
         // Back a Home (opcional)
         val btnRowBack: ImageButton = findViewById(R.id.btnBack)

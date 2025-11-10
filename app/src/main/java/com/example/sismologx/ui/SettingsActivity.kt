@@ -37,6 +37,21 @@ class SettingsActivity : AppCompatActivity() {
                 SettingsPrefs(this).setNotificationsEnabled(true)
             }
         }
+    // Arriba, junto al launcher de notificaciones:
+    private val requestContactsPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            val sw: Switch = findViewById(R.id.swContactos)
+            if (granted) {
+                SettingsPrefs(this).setContactsEnabled(true)
+                sw.isChecked = true
+                Toast.makeText(this, "Acceso a contactos activado", Toast.LENGTH_SHORT).show()
+            } else {
+                SettingsPrefs(this).setContactsEnabled(false)
+                sw.isChecked = false
+                Toast.makeText(this, "Permiso de contactos denegado", Toast.LENGTH_SHORT).show()
+            }
+        }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -96,6 +111,35 @@ class SettingsActivity : AppCompatActivity() {
             override fun onStartTrackingTouch(sb: SeekBar?) {}
             override fun onStopTrackingTouch(sb: SeekBar?) {}
         })
+        val swContactos: Switch = findViewById(R.id.swContactos)
+
+        // Estado inicial: preferencia + verificación de permiso real
+        val contactsEnabledPref = prefs.isContactsEnabled()
+        val hasContactsPerm = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.READ_CONTACTS
+        ) == PackageManager.PERMISSION_GRANTED
+        swContactos.isChecked = contactsEnabledPref && hasContactsPerm
+
+        // Listener del switch
+        swContactos.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                // Si no hay permiso, pedirlo; si ya está, solo persistir preferencia
+                if (!hasContactsPerm &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)
+                    != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestContactsPermission.launch(Manifest.permission.READ_CONTACTS)
+                } else {
+                    prefs.setContactsEnabled(true)
+                    Toast.makeText(this, "Acceso a contactos activado", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                prefs.setContactsEnabled(false)
+                Toast.makeText(this, "Acceso a contactos desactivado", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
 
         btnGuardarCambios.setOnClickListener {
             val current = (minMag + seekBarMagnitud.progress * step).coerceIn(minMag, maxMag)
