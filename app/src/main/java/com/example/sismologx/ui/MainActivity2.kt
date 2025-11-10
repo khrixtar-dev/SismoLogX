@@ -41,14 +41,7 @@ class MainActivity2 : AppCompatActivity() {
             }
         }
 
-        // Asignar Prioridad entre corrutinas
-        // Cargamos los sismos desde la API
-
-        //sismoViewModel.limpiarDB(this)
-        //sismoViewModel.cargarDB(this)
-        //sismoViewModel.cargarSismos()
-
-        // ManipularLista.orden(sismoViewModel, this)
+        //ManipularLista.orden(sismoViewModel, this)
 
 
 

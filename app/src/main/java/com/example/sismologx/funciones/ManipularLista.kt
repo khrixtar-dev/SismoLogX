@@ -11,11 +11,23 @@ import kotlinx.coroutines.withContext
 
 object ManipularLista {
     fun orden(sismoViewModel : SismoViewModel, context : Context){
-        sismoViewModel.viewModelScope.launch(Dispatchers.IO ) {
+        sismoViewModel.viewModelScope.launch {
             try {
-                sismoViewModel.limpiarDB(context)
-                sismoViewModel.cargarDB(context)
-                sismoViewModel.cargarSismos(context)
+                withContext(Dispatchers.IO) {
+                    sismoViewModel.limpiarDB(context)
+                }
+
+                /*
+                withContext(Dispatchers.IO) {
+                    sismoViewModel.cargarDB(context)
+                }
+
+                withContext(Dispatchers.IO) {
+                    sismoViewModel.cargarSismos(context)
+                }
+                */
+
+
 
                 withContext(Dispatchers.Main){
                     println("Iniciando Corrutinas en Orden")

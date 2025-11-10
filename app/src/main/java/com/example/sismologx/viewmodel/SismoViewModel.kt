@@ -25,6 +25,8 @@ class SismoViewModel : ViewModel() {
             daBaseRepo.clear(context)
             System.out.println("Se limpio la base de datos")
         }
+
+        cargarDB(context)
     }
 
     // Poblar la DB y luego cargar sismos con la DB (Data Base = Base de Datos)
@@ -54,6 +56,7 @@ class SismoViewModel : ViewModel() {
                 //
             }
             System.out.println("Se incerto algo")
+            cargarSismos(context)
         }
     }
 
@@ -79,6 +82,7 @@ class SismoViewModel : ViewModel() {
                             info = sismoLocal.info
                         )
                     }
+
                     if (listaNueva.isNotEmpty()) {
                         listaSismos.postValue(listaNueva)
                         System.out.println("Carga 2")
@@ -86,6 +90,7 @@ class SismoViewModel : ViewModel() {
                         listaSismos.postValue(emptyList())
                         System.out.println("Lista Vacia")
                     }
+                    System.out.println(listaNueva[0])
                 }
 
             } catch (e: Exception) {

@@ -11,6 +11,7 @@ object SismoLocalDBRepository {
     // Unit es similar al Void
     // use = Trata el bloque de codigo como un objeto, tambien cierra la base de datos de forma automatica
 
+
     // Insertar datos al sql
     suspend fun insert(context: Context, date: String, hour: String, place: String,
                        magnitude: String, depth: String, latitude: String, longitude: String,
