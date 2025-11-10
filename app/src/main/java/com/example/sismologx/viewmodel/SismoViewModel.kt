@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sismologx.model.Sismo
+import com.example.sismologx.model.SismoDB
 import com.example.sismologx.repository.SismoLocalDBRepository
 import com.example.sismologx.repository.SismoRepository
 import kotlinx.coroutines.Dispatchers
@@ -58,6 +59,42 @@ class SismoViewModel : ViewModel() {
 
 
     // Tomar datos de DB
+    fun cargarSismos(context : Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = daBaseRepo.getAll(context)
+                System.out.println("carga 1")
+                result.onSuccess {
+                    listaDatos ->
+                    val listaNueva = listaDatos.map { sismoLocal ->
+                        Sismo(
+                            date = sismoLocal.date,
+                            hour = sismoLocal.hour,
+                            place = sismoLocal.place,
+                            magnitude = sismoLocal.magnitude,
+                            depth = sismoLocal.depth,
+                            latitude = sismoLocal.latitude,
+                            longitude = sismoLocal.longitude,
+                            image = sismoLocal.image,
+                            info = sismoLocal.info
+                        )
+                    }
+                    if (listaNueva.isNotEmpty()) {
+                        listaSismos.postValue(listaNueva)
+                        System.out.println("Carga 2")
+                    } else {
+                        listaSismos.postValue(emptyList())
+                        System.out.println("Lista Vacia")
+                    }
+                }
+
+            } catch (e: Exception) {
+                listaSismos.postValue(emptyList())
+                System.out.println("Un error")
+            }
+        }
+    }
+    /*
     fun cargarSismos() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -74,4 +111,5 @@ class SismoViewModel : ViewModel() {
             }
         }
     }
+    */
 }

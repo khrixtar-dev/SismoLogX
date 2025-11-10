@@ -26,6 +26,7 @@ object SismoLocalDBRepository {
     }
 
     // Trae todos los datos del sql
+    // Validacion
     suspend fun getAll(context: Context): Result<List<SismoLocal>> = withContext(Dispatchers.IO) {
         runCatching {
             SismoDB(context).use { it.getAll() }

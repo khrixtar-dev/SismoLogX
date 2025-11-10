@@ -1,5 +1,6 @@
 package com.example.sismologx.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.widget.ListView
 import android.widget.Toast
@@ -9,9 +10,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.sismologx.R
-import com.example.sismologx.repository.SismoLocalDBRepository
+import com.example.sismologx.funciones.ManipularLista
 import com.example.sismologx.viewmodel.SismoViewModel
-
 
 class MainActivity2 : AppCompatActivity() {
 
@@ -30,6 +30,8 @@ class MainActivity2 : AppCompatActivity() {
         // Inicializamos el ViewModel
         sismoViewModel = ViewModelProvider(this)[SismoViewModel::class.java]
 
+        ManipularLista.orden(sismoViewModel, this)
+
         // Observamos la lista de sismos
         sismoViewModel.listaSismos.observe(this) { lista ->
             if (lista.isNotEmpty()) {
@@ -41,9 +43,14 @@ class MainActivity2 : AppCompatActivity() {
 
         // Asignar Prioridad entre corrutinas
         // Cargamos los sismos desde la API
-        sismoViewModel.limpiarDB(this)
-        sismoViewModel.cargarDB(this)
-        sismoViewModel.cargarSismos()
+
+        //sismoViewModel.limpiarDB(this)
+        //sismoViewModel.cargarDB(this)
+        //sismoViewModel.cargarSismos()
+
+        // ManipularLista.orden(sismoViewModel, this)
+
+
 
         // Ajuste de padding para barras de sistema
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
