@@ -54,7 +54,7 @@ class SyncWorker(appContext: Context, params: WorkerParameters) :
         try {
             // Estrategia simple: clear + inserts
             SismoLocalDBRepository.clear(applicationContext).getOrThrow()
-            for (s in body.data) {
+            for (s in body.data.asReversed()) {
                 SismoLocalDBRepository.insert(
                     applicationContext,
                     date = s.date,

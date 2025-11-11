@@ -56,7 +56,7 @@ class SismoDB(context: Context) :
         try {
             db.delete(TABLE_SISMOS, null, null)
             val cv = ContentValues()
-            for (s in data) {
+            for (s in data.asReversed()) {
                 cv.clear()
                 cv.put(COL_DATE, s.date); cv.put(COL_HOUR, s.hour); cv.put(COL_PLACE, s.place)
                 cv.put(COL_MAGNITUDE, s.magnitude); cv.put(COL_DEPTH, s.depth)
