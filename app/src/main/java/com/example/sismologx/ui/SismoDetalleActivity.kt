@@ -127,7 +127,7 @@ class SismoDetalleActivity : AppCompatActivity() {
         tvLatLon.text = latlon
 
         // Construimos el mensaje a compartir
-        shareMessage = "He sentido un sismo de magnitud M $mag que ocurrio a $place, a una profundidad de $depth km. ¿Tú lo has sentido?"
+        shareMessage = "He sentido un sismo de magnitud M $mag que ocurrio a $place, a una profundidad de $depth. ¿Tú lo has sentido?"
 
         // Back
         btnRowBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
