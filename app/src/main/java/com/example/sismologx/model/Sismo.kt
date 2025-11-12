@@ -12,9 +12,6 @@ data class Sismo(
     val info: String
 )
 
-
-
-
 /*
       RESPUESTA JSON DE LA API
 *     "date": "2025-10-28",

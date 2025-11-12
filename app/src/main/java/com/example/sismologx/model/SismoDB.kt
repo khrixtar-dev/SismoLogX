@@ -47,8 +47,6 @@ class SismoDB(context: Context) :
         }
         return writableDatabase.insert(TABLE_SISMOS, null, cv)
     }
-
-    /** Reemplaza TODO en una transacción (clear + insertAll). */
     fun replaceAll(data: List<SismoLocal>): Int {
         val db = writableDatabase
         var inserted = 0
@@ -113,7 +111,6 @@ class SismoDB(context: Context) :
     }
 }
 
-/** Igual a Sismo pero con id autoincrement para la DB local. */
 data class SismoLocal(
     val id: Int,
     val date: String,

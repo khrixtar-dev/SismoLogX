@@ -37,7 +37,7 @@ class SettingsActivity : AppCompatActivity() {
                 SettingsPrefs(this).setNotificationsEnabled(true)
             }
         }
-    // Arriba, junto al launcher de notificaciones:
+
     private val requestContactsPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             val sw: Switch = findViewById(R.id.swContactos)
@@ -61,7 +61,6 @@ class SettingsActivity : AppCompatActivity() {
 
         //VENTANA CONFIGURACIONES
 
-        //HELPERS Y RANGOS
         val prefs = SettingsPrefs(this)
         val minMag = 1.0
         val maxMag = 8.0
@@ -113,7 +112,7 @@ class SettingsActivity : AppCompatActivity() {
         })
         val swContactos: Switch = findViewById(R.id.swContactos)
 
-        // Estado inicial: preferencia + verificación de permiso real
+
         val contactsEnabledPref = prefs.isContactsEnabled()
         val hasContactsPerm = ContextCompat.checkSelfPermission(
             this, Manifest.permission.READ_CONTACTS
@@ -139,8 +138,6 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
-
-
         btnGuardarCambios.setOnClickListener {
             val current = (minMag + seekBarMagnitud.progress * step).coerceIn(minMag, maxMag)
             val rounded = round(current * 10) / 10.0
@@ -158,10 +155,10 @@ class SettingsActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
-        // dentro de onCreate(...)
+
         val btnTestNotif: Button = findViewById(R.id.btnTestNotif)
         btnTestNotif.setOnClickListener {
-            // Android 13+ pide permiso en runtime
+
             if (Build.VERSION.SDK_INT >= 33 &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED
@@ -170,7 +167,7 @@ class SettingsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Datos falsos simulando un sismo real
+            // Datos falsos
             val fakeMag = 6.4
             val fakePlace = "85 km al NO de Iquique"
             val fakeDepth = "35 km"
@@ -178,7 +175,7 @@ class SettingsActivity : AppCompatActivity() {
             val title = "Alerta de nuevo sismo de ${"%.1f".format(fakeMag)}"
             val text  = "Lugar: $fakePlace\nProfundidad: $fakeDepth"
 
-            // Manda la notificación usando el mismo helper de producción
+            // Manda la notificación
             val fakeId = "test-${System.currentTimeMillis()}"
             QuakeNotifier.notify(this, fakeId, title, text)
 

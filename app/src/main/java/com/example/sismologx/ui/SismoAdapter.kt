@@ -44,8 +44,8 @@ class SismoAdapter(
         val background = tvMagnitude.background.mutate() as GradientDrawable
 
         val color = when {
-            magnitudeValue >= 7.0 -> Color.parseColor("#ef4444")// rojo intenso
-            magnitudeValue >= 6.0 -> Color.parseColor("#f97316") // naranjo
+            magnitudeValue >= 6.0 -> Color.parseColor("#ef4444")// rojo intenso
+            magnitudeValue >= 5.0 -> Color.parseColor("#f97316") // naranjo
             magnitudeValue >= 4.0 -> Color.parseColor("#eab308") // amarillo claro
             else -> Color.parseColor("#22c55e") // verde
         }

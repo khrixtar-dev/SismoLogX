@@ -15,20 +15,13 @@ class SismoViewModel : ViewModel() {
 
     val listaSismos: MutableLiveData<List<Sismo>> = MutableLiveData()
     private val repository = SismoRepository()
-
-    /** Elimina la cache local (no publica vacío para evitar parpadeo). */
     suspend fun limpiarDB(context: Context) {
         SismoLocalDBRepository.clear(context).getOrElse { throw it }
     }
-
-    /** Lee desde SQLite y publica en el LiveData (fuente = DB). */
     suspend fun cargarDB(context: Context) {
         val locales = SismoLocalDBRepository.getAll(context).getOrElse { throw it }
         listaSismos.postValue(locales.map { it.toModel() })
     }
-
-    /** Fetch remoto -> persistir en SQLite -> leer DB -> publicar
-     */
     suspend fun cargarSismos(context: Context) {
         withContext(Dispatchers.IO) {
             runCatching { repository.obtenerSismos() }
@@ -42,5 +35,4 @@ class SismoViewModel : ViewModel() {
         }
         runCatching { cargarDB(context) }.onFailure { listaSismos.postValue(emptyList()) }
     }
-    // fun cargarSismos()
 }

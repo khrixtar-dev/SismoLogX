@@ -39,11 +39,7 @@ import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 class SismoDetalleActivity : AppCompatActivity() {
 
     private var mapView: MapView? = null
-
-    // Texto que compartiremos (se arma en onCreate a partir de los extras)
     private var shareMessage: String = ""
-
-    // Launcher para escoger un número de teléfono desde Contactos
     private val pickPhoneLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -65,7 +61,6 @@ class SismoDetalleActivity : AppCompatActivity() {
             }
         }
 
-    // Pedir permiso READ_CONTACTS en tiempo de uso
     private val requestContactsPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
@@ -84,7 +79,6 @@ class SismoDetalleActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.sismo_detalle_activity)
 
-        // variables UI
         val tvMagnitud: TextView = findViewById(R.id.tvMagnitud)
         val tvLugar: TextView = findViewById(R.id.tvLugar)
         val tvFechaHora: TextView = findViewById(R.id.tvFechaHora)
@@ -108,7 +102,7 @@ class SismoDetalleActivity : AppCompatActivity() {
         val latlon = intent.getStringExtra("latlon") ?: "-"
         val infoUrl = intent.getStringExtra("infoUrl")
 
-        // Formateo simple de fecha/hora a "dd-MM-yyyy   HH:mm:ss"
+
         val inFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         val outD = DateTimeFormatter.ofPattern("dd-MM-yyyy")
         val outT = DateTimeFormatter.ofPattern("HH:mm:ss")
@@ -119,14 +113,12 @@ class SismoDetalleActivity : AppCompatActivity() {
             dateHour.replace("-", "/")
         }
 
-        // Pintar
         tvMagnitud.text = "M $mag"
         tvLugar.text = place
         tvFechaHora.text = fechaHoraUi
         tvProfundidad.text = depth
         tvLatLon.text = latlon
 
-        // Construimos el mensaje a compartir
         shareMessage = "He sentido un sismo de magnitud M $mag que ocurrio a $place, a una profundidad de $depth. ¿Tú lo has sentido?"
 
         // Back
@@ -155,7 +147,7 @@ class SismoDetalleActivity : AppCompatActivity() {
             startActivity(news)
         }
 
-        // -------- Mapbox dentro de la Card --------
+        // Mapbox dentro del Card
         mapView = findViewById(R.id.mapView)
 
         // Para parsear "lat, lon"
@@ -177,10 +169,9 @@ class SismoDetalleActivity : AppCompatActivity() {
                     .build()
             )
 
-            // Estilo + marcador con ícono desde drawable (SVG)
+            // marcador (SVG)
             mapView?.mapboxMap?.loadStyle(
                 style(Style.MAPBOX_STREETS) {
-                    // aquí podrías añadir sources/layers si los necesitaras
                 }
             ) { _ ->
                 val annPlugin = mapView?.annotations
@@ -202,7 +193,7 @@ class SismoDetalleActivity : AppCompatActivity() {
         }
 
 
-        // --- NUEVO: ¿Lo sentiste? -> elegir contacto y abrir SMS ---
+        //Lo sentiste?
         btnLoSentiste.setOnClickListener {
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
@@ -211,7 +202,7 @@ class SismoDetalleActivity : AppCompatActivity() {
             startActivity(Intent.createChooser(intent, "Compartir sismo"))
         }
 
-        // --- NUEVO: compartir general (cualquier app) ---
+        //compartir general
         btnShareTop.setOnClickListener {
             // Verifica preferencia de acceso a contactos
             val prefs = SettingsPrefs(this)
@@ -224,7 +215,7 @@ class SismoDetalleActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Verifica permiso READ_CONTACTS del sistema
+            // Verifica permiso READ_CONTACTS
             val hasPerm = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.READ_CONTACTS
             ) == PackageManager.PERMISSION_GRANTED
@@ -235,8 +226,6 @@ class SismoDetalleActivity : AppCompatActivity() {
                 launchPickContact()
             }
         }
-
-        // Insets
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.rootDetalle)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -261,7 +250,7 @@ class SismoDetalleActivity : AppCompatActivity() {
         }
     }
 
-    // Delegar ciclo de vida al MapView
+    // ciclo de vida al MapView
     override fun onStart() {
         super.onStart()
         mapView?.onStart()

@@ -17,15 +17,12 @@ import kotlin.math.round
 
 // 👇 NUEVOS IMPORTS para cache local
 import com.example.sismologx.repository.SismoLocalDBRepository
-// (no hace falta importar SismoLocal; insert() recibe los campos sueltos)
 
 class SyncWorker(appContext: Context, params: WorkerParameters) :
     CoroutineWorker(appContext, params) {
 
     private val prefs = SettingsPrefs(appContext)
     private val notifyState = NotifyState(appContext)
-
-    // Patrones posibles según APIs típicas (ajústalos si tu backend cambia)
     private val datePatterns = listOf(
         DateTimeFormatter.ofPattern("dd-MM-yyyy"),
         DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -36,7 +33,6 @@ class SyncWorker(appContext: Context, params: WorkerParameters) :
     )
 
     override suspend fun doWork(): Result {
-        // Si el usuario desactivó notificaciones, salimos pronto
         if (!prefs.isNotificationsEnabled()) return Result.success()
 
         val resp: Response<SismoResponse> = try {
@@ -48,11 +44,9 @@ class SyncWorker(appContext: Context, params: WorkerParameters) :
         if (!resp.isSuccessful) return Result.retry()
         val body = resp.body() ?: return Result.success()
 
-        // === Persistencia local (offline) ==============================
-        // Guardamos SIEMPRE lo que vino de la API para que la app tenga
-        // datos disponibles sin Internet la próxima vez que se abra.
+        // Persistencia local offline
         try {
-            // Estrategia simple: clear + inserts
+            // clear + inserts
             SismoLocalDBRepository.clear(applicationContext).getOrThrow()
             for (s in body.data.asReversed()) {
                 SismoLocalDBRepository.insert(
@@ -69,26 +63,18 @@ class SyncWorker(appContext: Context, params: WorkerParameters) :
                 ).getOrThrow()
             }
         } catch (_: Exception) {
-            // Si la cache falla, NO rompemos el worker ni las notificaciones
         }
-        // ===============================================================
 
         val lastEpoch = notifyState.getLastEpoch()
         val threshold = prefs.getThreshold()
-
-        // Mapeo a candidatos con epoch sólido (si no se puede parsear, se descarta)
         val candidatos = body.data.mapNotNull { s -> toCandidateOrNull(s) }
 
         if (candidatos.isEmpty()) return Result.success()
-
-        // Bootstrap: primera vez (o sin estado) => fija el último y no notifiques
         if (lastEpoch == 0L) {
             val maxEpoch = candidatos.maxOf { it.epochMillis }
             notifyState.setLastEpoch(maxEpoch)
             return Result.success()
         }
-
-        // Filtra por umbral y novedad; toma solo el más reciente
         val ultimo = candidatos
             .asSequence()
             .filter { it.magnitude >= threshold }
@@ -103,8 +89,6 @@ class SyncWorker(appContext: Context, params: WorkerParameters) :
             val text = "Lugar: $place\nProfundidad: $depth"
 
             QuakeNotifier.notify(applicationContext, ultimo.id, title, text)
-
-            // actualiza último notificado para evitar repeticiones
             notifyState.setLastEpoch(ultimo.epochMillis)
         }
 

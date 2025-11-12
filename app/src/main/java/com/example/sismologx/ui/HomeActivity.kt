@@ -23,11 +23,11 @@ class HomeActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.home_activity)
 
-        // Programa el worker periódico (se encola solo una vez)
+        // worker periodico 1 sola vez
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
-
+        // repeticion
         val work = PeriodicWorkRequestBuilder<SyncWorker>(1, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
@@ -38,12 +38,12 @@ class HomeActivity : AppCompatActivity() {
             work
         )
 
-        // Referencias a las tarjetas del home
+
         val cardSismos : CardView = findViewById(R.id.cardSismos)
         val cardGuia   : CardView = findViewById(R.id.cardGuia)
         val cardConfig : CardView = findViewById(R.id.cardConfig)
 
-        // Navegación
+        //enlaces a las demas ventanas
         cardSismos.setOnClickListener {
             val toUltimosSismos = Intent(this, SismosActivity::class.java)
             startActivity(toUltimosSismos)

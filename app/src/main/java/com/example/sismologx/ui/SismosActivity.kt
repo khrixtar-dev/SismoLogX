@@ -20,8 +20,6 @@ class SismosActivity : AppCompatActivity() {
 
     private lateinit var lvSismosRecientes: ListView
     private lateinit var sismoViewModel: SismoViewModel
-
-    // >>> guarda la lista actual para usarla en el click
     private var listaActual: List<Sismo> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,8 +34,6 @@ class SismosActivity : AppCompatActivity() {
             if (lista.isNotEmpty()) {
                 listaActual = lista
                 lvSismosRecientes.adapter = SismoAdapter(this, lista)
-
-                // >>> click para abrir el detalle con extras
                 lvSismosRecientes.setOnItemClickListener { _, _, position, _ ->
                     val s = listaActual[position]
                     val intent = Intent(this, SismoDetalleActivity::class.java).apply {
@@ -55,18 +51,12 @@ class SismosActivity : AppCompatActivity() {
                 Toast.makeText(this, "No hay sismos recientes", Toast.LENGTH_SHORT).show()
             }
         }
-
-        // Cargar sismos
-        // Antiguo
-        // sismoViewModel.cargarSismos()
-
-        //Nuevo
         ManipularLista.orden(sismoViewModel, this)
 
-        // Back a Home (opcional)
+        // Back
         val btnRowBack: ImageButton = findViewById(R.id.btnBack)
         btnRowBack.setOnClickListener {
-            finish() // más rápido que crear un Intent nuevo
+            finish()
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
